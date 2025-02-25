@@ -97,9 +97,13 @@ def upload_audio():
         return "No audio data in request", 400
 
     file = request.files['audio_data']
+    
     if file.filename == '':
         print("No file selected")
         return "No file selected", 400
+
+    print(f"Received file: {file.filename}")  # Debugging
+
 
     # Save the uploaded audio file with a unique name
     filename = datetime.now().strftime("%Y%m%d-%I%M%S%p") + '.wav'
@@ -237,8 +241,9 @@ def save_sentiment_result(text, sentiment_label, score, magnitude, original_file
 
 
 
-@app.route('/sentiments/<filename>')
+@app.route('/download_sentiment/<filename>')
 def download_sentiment(filename):
+    # This assumes your sentiment files are stored in a 'sentiments' folder
     return send_from_directory('sentiments', filename)
 
 
