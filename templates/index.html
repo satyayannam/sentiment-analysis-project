@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Recorder and TTS</title>
+</head>
+<body>
+    <table style="width:100%">
+        <tr>
+            <td style="width:50%">
+                <h1>Speech-to-text and Text-to-speech converter</h1>
+                <h2>Record and Upload Audio</h2>
+
+                <button id="record">Record</button>
+                <button id="stop">Stop</button>
+                <span id="timer">00:00</span>
+                <audio id="audio"></audio>
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="audio_data" id="audioData">
+                </form>
+                <script src="script.js"></script>
+                <hr>
+                <h2>Recorded Files</h2>
+                <ul>
+                    {% for file in files %}
+                        {% if file.endswith('.wav') %}  {# Only process WAV files #}
+                        <li> 
+                            <audio controls>
+                                <source src="{{ url_for('uploaded_file', filename=file) }}" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio><br>
+                
+                            {{ file }}
+                            <a href="{{ url_for('uploaded_file', filename=file.replace('.wav', '.txt')) }}">View Transcript</a><br>
+                            <a href="{{ url_for('download_sentiment', filename='sentiment_' + file.replace('.wav', '.txt')) }}">View Sentiment</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                
+            </td>
+            <td style="width:50%">
+                <h2>Type in Your Text to Generate Audio</h2>
+
+                <form action="/upload_text" method="post">
+                    <textarea name="text" rows="10" cols="50" placeholder="Enter your text here..."></textarea>
+                    <br>
+                    <input type="submit" value="Generate Audio">
+                </form>
+
+                <hr>
+                <h2>Generated TTS Audio Files</h2>
+                <ul>
+                    {% for file in tts_files %}
+                    <li>
+                        <audio controls>
+                            <source src="{{ url_for('serve_tts_file', filename=file) }}" type="audio/mp3">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <br>{{ file }}
+                        {% if file in tts_sentiments %}
+                            <a href="{{ url_for('download_sentiment', filename=tts_sentiments[file]) }}">View Sentiment</a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
